@@ -40,6 +40,16 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: |
+            dist
+            public
+            package.json
+
   deploy:
     needs: [test, build]
     runs-on: ubuntu-latest
