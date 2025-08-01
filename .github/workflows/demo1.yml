@@ -1,17 +1,18 @@
-name: Events Demo 1
+name: "Events Demo 1"
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
-
+  push:
+    branches:
+      - main #main
+      - "dev-*" #dev-*
+      - "feature/**" #feature/** feature-1/branches/navbar
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Print triggering branch
-        run: echo "Branch: ${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
