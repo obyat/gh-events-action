@@ -1,14 +1,21 @@
 name: "Events Demo 1"
 
 on:
-  pull_request:
+  pull_request: # Trigger on pull request events to specific branches
     types: [opened, synchronize, reopened]
+    branches:
+      - main #main
+      - "dev-*" #dev-*
+      - "feature/**" #feature/** feature-1/branches/navbar
   workflow_dispatch:
   push:
     branches:
       - main #main
       - "dev-*" #dev-*
       - "feature/**" #feature/** feature-1/branches/navbar
+    paths-ignore:
+      - .github/workflows/demo1.yml # Ignore changes to this workflow file
+      - .gitignore # Ignore changes to .gitignore file
 jobs:
   test:
     runs-on: ubuntu-latest
