@@ -1,30 +1,27 @@
 name: "Parallel Events"
 
 on:
-  pull_request: # Trigger on pull request events to specific branches
+  pull_request:
     types: [opened, synchronize, reopened]
     branches:
-      - main #main
-      - "dev-*" #dev-*
-      - "feature/**" #feature/** feature-1/branches/navbar
+      - main
+      - "dev-*"
+      - "feature/**"
   workflow_dispatch:
   push:
     branches:
-      - main #main
-      - "dev-*" #dev-*
-      - "feature/**" #feature/** feature-1/branches/navbar
+      - main
+      - "dev-*"
+      - "feature/**"
     paths-ignore:
-      - .github/workflows/demo1.yml # Ignore changes to this workflow file
-      - .gitignore # Ignore changes to .gitignore file
+      - .github/workflows/demo1.yml
+      - .gitignore
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm ci
+      - <<: *setup-node
 
       - name: Run tests
         run: npm run test
@@ -32,11 +29,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm ci
+      - <<: *setup-node
 
       - name: Run lint
         run: npm run lint
@@ -48,14 +41,36 @@ jobs:
       - name: Output event data
         run: echo "${{ toJSON(github.event) }}"
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm ci
+      - <<: *setup-node
 
       - name: Build code
         run: npm run build
 
       - name: Deploy project
         run: echo "🚀 Deploying..."
+
+# -------------------------------------
+# Anchored reusable setup for Node.js
+# -------------------------------------
+  _reusable_steps:
+    - &setup-node
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
