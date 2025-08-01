@@ -25,7 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print triggering branch
-        run: echo "Branch: ${{ github.head_ref || github.ref_name }}"
+        run: |
+          echo "Branch: ${{ github.head_ref != '' && github.head_ref || github.ref_name }}"
 
       - name: Checkout code
         uses: actions/checkout@v3
