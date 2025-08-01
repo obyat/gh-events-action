@@ -44,31 +44,31 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-files
-          path: |
-            dist
-            package.json
+      # - name: Upload build artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dist-files
+      #     path:
+      #       dist
+      #       package.json
 
-  deploy:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: dist-files
-          path: ./deploy-dist
+  # deploy:
+  #   needs: [build]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: dist-files
+  #         path: ./deploy-dist
 
-      - name: Output event data
-        run: echo "${{ toJSON(github.event) }}"
+  #     - name: Output event data
+  #       run: echo "${{ toJSON(github.event) }}"
 
-      - name: Deploy project
-        run: |
-          echo "Contents of build directory:"
-          ls ./deploy-dist
-          echo "🚀 Deploying from ./deploy-dist..."
-          # Replace with actual deploy command
-          # e.g. npm run deploy --prefix ./deploy-dist
+  #     - name: Deploy project
+  #       run: |
+  #         echo "Contents of build directory:"
+  #         ls ./deploy-dist
+  #         echo "🚀 Deploying from ./deploy-dist..."
+  #         # Replace with actual deploy command
+  #         # e.g. npm run deploy --prefix ./deploy-dist
