@@ -24,9 +24,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Print triggering branch
-        run: echo "Branch: ${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
