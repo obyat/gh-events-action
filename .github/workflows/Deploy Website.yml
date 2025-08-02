@@ -23,16 +23,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          
+
       # Cache dependency installation
       - name: Cache Dependencies
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          # `hashFiles` generates a unique cache key based on the contents of package-lock.json.
-          # This ensures the cache is reused **only** when dependencies haven't changed.
-          # It avoids unnecessary `npm ci` runs and speeds up builds.
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run tests
         run: npm run test
@@ -51,15 +51,20 @@ jobs:
         with:
           node-version: "18"
 
-      # Cache dependency installation
+      # `hashFiles` generates a unique cache key based on the contents of package-lock.json.
+      # This ensures the cache is reused **only** when dependencies haven't changed.
+      # It avoids unnecessary `npm ci` runs and speeds up builds.
       - name: Cache Dependencies
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          # `hashFiles` generates a unique cache key based on the contents of package-lock.json.
-          # This ensures the cache is reused **only** when dependencies haven't changed.
-          # It avoids unnecessary `npm ci` runs and speeds up builds.
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+    
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
 
       - name: Build project
         run: npm run build
@@ -94,4 +99,3 @@ jobs:
 
       - name: Deploy
         run: echo "Deploying..."
-
