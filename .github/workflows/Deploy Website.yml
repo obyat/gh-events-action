@@ -13,6 +13,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outuputs:
+      script-file: ${{ steps.publish-step-id.outputs.js-file-name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -27,6 +29,7 @@ jobs:
 
       - name: Run tests
         run: npm run test
+
 
   build:
     runs-on: ubuntu-latest
@@ -46,10 +49,29 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Publish JS filename
+        id: publish-step-id
+        run: find dist/assets/*js -type f -execdir echo 'js-file-name={}' >> $GITHUB_OUTPUT';'
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist-files
-          path: |
-            dist
-            package.json
+      #     path: |
+      #       dist
+      #       package.json
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: dist-files
+      - name: Output contents
+        run: ls
+      - name: Output filename
+        run: echo "${{ needs.build.outputs.script-file }}"
+      - name: Deploy
+        run: echo "Deploying..."
