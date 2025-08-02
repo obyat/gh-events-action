@@ -7,7 +7,9 @@ on:
   pull_request:
     branches:
       - main
-
+permissions:
+  contents: write
+  id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -48,26 +50,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist-files
-          path: dist
+          path: |
+            dist
             package.json
-
-  # deploy:
-  #   needs: [build]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: dist-files
-  #         path: ./deploy-dist
-
-  #     - name: Output event data
-  #       run: echo "${{ toJSON(github.event) }}"
-
-  #     - name: Deploy project
-  #       run: |
-  #         echo "Contents of build directory:"
-  #         ls ./deploy-dist
-  #         echo "🚀 Deploying from ./deploy-dist..."
-  #         # Replace with actual deploy command
-  #         # e.g. npm run deploy --prefix ./deploy-dist
