@@ -1,0 +1,103 @@
+name: Deploy Website
+
+# Triggers the workflow on push or PR to `main` branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Grant permissions to allow the workflow to access contents and GitHub OIDC (for deploys)
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code from the repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Node.js with built-in dependency caching enabled
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"  # Automatically caches ~/.npm and node_modules
+
+      # Install dependencies using npm
+      - name: Install dependencies
+        run: npm ci  # Clean install ensures reproducible builds
+
+      # Run your test suite (e.g. Vitest, Jest, etc.)
+      - name: Run tests
+        run: npm run test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test  # Only runs after the `test` job completes successfully
+
+    # Output a value (JS filename) that will be used in the deploy job
+    outputs:
+      script-file: ${{ steps.publish-step-id.outputs.js-file-name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Node.js with npm cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Build the project (e.g. using Vite, Webpack, etc.)
+      - name: Build project
+        run: npm run build
+
+      # Find the first built JS file and pass its name as output to the deploy job
+      - name: Publish JS filename
+        id: publish-step-id
+        run: |
+          echo "js-file-name=$(find dist/assets -type f -name '*.js' | head -n 1)" >> $GITHUB_OUTPUT
+
+      # Upload the build output so the deploy job can use it
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist  # Only upload what's needed — the final build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Only deploy from the main branch to avoid deploying preview PRs
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      # Download the artifacts from the build job
+      - name: Get build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+
+      # List the downloaded files (for debugging)
+      - name: Output contents
+        run: ls -R
+
+      # Output the filename generated in the build job
+      - name: Output filename
+        run: echo "${{ needs.build.outputs.script-file }}"
+
+      # Actual deploy command — replace this with your real deployment step
+      - name: Deploy
+        run: echo "Deploying..."
