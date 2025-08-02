@@ -1,4 +1,4 @@
-name: Deploy Website
+name: Optimized Deploy Website
 
 # Triggers the workflow on push or PR to `main` branch
 on:
